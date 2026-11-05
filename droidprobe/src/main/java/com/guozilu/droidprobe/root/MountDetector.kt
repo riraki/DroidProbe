@@ -107,13 +107,7 @@ class MountDetector : AbstractDetector(
          * @return 如果在就返回 true，否则返回 false
          */
         private fun isSystemMountPointsToCheckPath(mountPoint: String): Boolean {
-            for (path: String in SYSTEM_MOUNT_POINTS_TO_CHECK_PATHS) {
-                if (path == mountPoint) {
-                    return true
-                }
-            }
-
-            return false
+            return mountPoint in SYSTEM_MOUNT_POINTS_TO_CHECK_PATHS
         }
 
         /**
