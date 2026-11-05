@@ -8,8 +8,7 @@ object MountUtils {
     }
 
     fun getMounts(): List<MountInfo>? {
-        val mounts: Array<MountInfo> = getMountsNative() ?: return null
-        return listOf(*mounts)
+        return getMountsNative()?.asList()
     }
 
     /**
