@@ -21,9 +21,7 @@ abstract class CompositeDetector(
      * @return 所有分支的 Detector 的检测结果的聚合
      */
     protected fun detectChildren(context: Context?): MutableList<DetectionResult> {
-        val results: MutableList<DetectionResult> = ArrayList()
-        detectors.forEach { detector -> results.add(detector.detect(context)) }
-        return results
+        return detectors.map { it.detect(context) }.toMutableList()
     }
 
     companion object {
