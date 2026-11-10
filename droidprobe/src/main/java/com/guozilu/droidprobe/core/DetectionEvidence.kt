@@ -6,9 +6,9 @@ class DetectionEvidence(
     val description: String?) {
 
     override fun toString(): String {
-        return "DetectionEvidence{type='$type'" +
-                ", value='$value'" +
-                ", description='$description'}"
+        return "DetectionEvidence{type=\"$type\"" +
+                ", value=\"$value\"" +
+                ", description=\"$description\"}"
     }
 
     companion object {
