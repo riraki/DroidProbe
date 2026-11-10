@@ -22,13 +22,13 @@ abstract class AbstractNativeRootDetector(
     final override fun doDetect(context: Context?): DetectionResult {
         val evidences: MutableList<DetectionEvidence> = ArrayList()
 
-        // Native 层只负责采集证据和计算最高命中分值，风险等级由 Java 层统一管理。
+        // Native 层只负责采集证据和计算最高命中分值，风险等级由 Java 层统一管理
         val riskScore: Int
         try {
             riskScore = nativeScan(evidences)
         }   // 因为 kotlin 不支持像 catch (RuntimeException | LinkageError) 的写法，这里只能这样重复写了
         catch (exception: RuntimeException) {
-            // JNI 加载、链接或调用发生异常时，不应让单个检测器影响整个扫描流程。
+            // JNI 加载、链接或调用发生异常时，不应让单个检测器影响整个扫描流程
             evidences.add(DetectionEvidence(
                     "NATIVE_SCAN_ERROR",
                 exception.javaClass.getName(),
@@ -41,7 +41,7 @@ abstract class AbstractNativeRootDetector(
             )
         }
         catch (exception: LinkageError) {
-            // JNI 加载、链接或调用发生异常时，不应让单个检测器影响整个扫描流程。
+            // JNI 加载、链接或调用发生异常时，不应让单个检测器影响整个扫描流程
             evidences.add(DetectionEvidence(
                 "NATIVE_SCAN_ERROR",
                 exception.javaClass.getName(),
@@ -78,8 +78,8 @@ abstract class AbstractNativeRootDetector(
             return createResult(DetectionStatus.UNKNOWN, RiskLevel.UNKNOWN, evidences)
         }
 
-        // 即使 riskScore == 0 也只是扫描完成但未命中当前已配置的 KernelSU 特征。
-        // 这只表示“未发现已知特征”，不代表可以排除所有隐藏或修改过的实现。
+        // 即使 riskScore == 0 也只是扫描完成但未命中当前已配置的 KernelSU 特征
+        // 这只表示“未发现已知特征”，不代表可以排除所有隐藏或修改过的实现
         if (riskScore == 0) {
             return createResult(DetectionStatus.NOT_DETECTED, RiskLevel.NONE, evidences)
         }

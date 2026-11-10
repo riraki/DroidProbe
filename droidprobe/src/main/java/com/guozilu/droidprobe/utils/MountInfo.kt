@@ -8,10 +8,11 @@ class MountInfo(
      val superOptions: String) {
 
     override fun toString(): String {
-        return "MountInfo{mountPoint='$mountPoint'" +
-                ", mountOptions='$mountOptions'" +
-                ", filesystemType='$filesystemType'" +
-                ", mountSource='$mountSource'" +
-                ", superOptions='$superOptions'}"
+        return "MountInfo{mountPoint=\"$mountPoint\"" +
+                ", mountOptions=\"$mountOptions\"" +
+                ", filesystemType=\"$filesystemType\"" +
+                ", mountSource=\"$mountSource\"" +
+                ", superOptions=\"$superOptions\"" +
+                "}"
     }
 }

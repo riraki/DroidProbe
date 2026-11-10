@@ -8,7 +8,7 @@ class DetectionResult(
     val evidences: List<DetectionEvidence?>?) {
 
     override fun toString(): String {
-        return "DetectionResult{name='$name'" +
+        return "DetectionResult{name=\"$name\"" +
                 ", category=$category" +
                 ", status=$status" +
                 ", riskLevel=$riskLevel" +
