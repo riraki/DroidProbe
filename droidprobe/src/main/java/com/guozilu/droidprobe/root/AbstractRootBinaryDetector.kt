@@ -75,16 +75,14 @@ abstract class AbstractRootBinaryDetector(
      * @return 如果命令执行成功，那么返回命令输出的内容，否则返回 null
      */
     private fun getWhichBinaryResult(): String? {
-        try {
+        return runCatching {
             val process: Process = Runtime.getRuntime().exec(arrayOf("which", rootBinaryName))
-            BufferedReader(InputStreamReader(process.inputStream)).use {
-                reader -> return reader.readLine()
-            }
-        }
-        catch (e: IOException) {
-            Log.e(TAG, "An exception was caught in AbstractRootBinaryDetector.getWhichBinaryResult()", e)
-            return null
-        }
+            process.inputStream.bufferedReader().use {
+                it.readLine()
+            }.also { process.destroy() }
+        }.onFailure {
+            Log.e(TAG, "An exception was caught in AbstractRootBinaryDetector.getWhichBinaryResult()", it)
+        }.getOrNull()
     }
 
     /**
@@ -94,7 +92,7 @@ abstract class AbstractRootBinaryDetector(
      */
     private fun detectBinaryPathEvidences(path: String): List<DetectionEvidence> {
         val evidences: MutableList<DetectionEvidence> = ArrayList()
-        val file: File = File(path)
+        val file = File(path)
         if (file.exists()) {
             evidences.add(DetectionEvidence(
                 file.name.uppercase() + "_PATH",

@@ -46,39 +46,20 @@ class SuDetector : AbstractRootBinaryDetector(
      * @return 如果能正常执行就返回得到的结果，否则返回 null
      */
     override fun executeBinary(): String? {
-        try {
+        return runCatching {
             val process: Process = Runtime.getRuntime().exec(arrayOf("su", "-c", "id"))
-            BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
-                BufferedReader(InputStreamReader(process.errorStream)).use { errorReader ->
+            process.inputStream.bufferedReader().use { reader ->
+                process.errorStream.bufferedReader().use { errorReader ->
                     // 如果用户拒绝了权限，那么 result 就应该是 null，error 是 Permission denied
                     // 如果用户允许了，那么 result 就应该是 uid=0(root) gid=0(root) groups=0(root) context=u:r:magisk:s0
                     // error 是 null
-                    val result: String? = reader.readLine()
-                    if (result != null) {
-                        val resultSplit: List<String> = result.split("\\s+")
-                        if (resultSplit[0].contains("root") || resultSplit[0].contains("uid=0") ||
-                            resultSplit[1].contains("root") || resultSplit[1].contains("gid=0") ||
-                            resultSplit[2].contains("root") || resultSplit[2].contains("groups=0")) {
-                            return result
-                        }
-                    }
-
-                    val error: String? = errorReader.readLine()
-                    // 这个时候肯定是告诉我们说权限不允许，因为这个文件一定存在（执行这个函数前就找出了文件的位置）
-                    // 那么权限不允许说明什么叫不必多说了吧
-                    if (error != null) {
-                        return error
-                    }
-
+                    reader.readLine() ?: errorReader.readLine() ?: "command out: null, error message: null"
                     // 按道理来说是执行不到这里的，这两个不可能都是 null
-                    return "command out: $result, error message: $error"
                 }
-            }
-        }
-        catch (e: IOException) {
-            Log.e(TAG, "An exception threw in SuDetector.executeBinary()", e)
-            return null
-        }
+            }.also { process.destroy() }
+        }.onFailure {
+            Log.e(TAG, "An exception threw in SuDetector.executeBinary()", it)
+        }.getOrNull()
     }
 
     companion object {

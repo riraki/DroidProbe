@@ -47,32 +47,20 @@ class BusyBoxDetector : AbstractRootBinaryDetector(
      * @return 如果能正常执行就返回得到的结果，否则返回 null
      */
     override fun executeBinary(): String? {
-        try {
+        return runCatching {
             // Environment.getExternalStorageDirectory().getPath() 返回的结果按道理来说就是 /sdcard
             val process: Process = Runtime.getRuntime().exec(
                 arrayOf("busybox", "ls", Environment.getExternalStorageDirectory().path)
             )
-            BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
-                BufferedReader(InputStreamReader(process.errorStream)).use { errorReader ->
-                    val result: String? = reader.readLine()
-                    if (result != null) {
-                        return result
-                    }
-
-                    val error: String? = errorReader.readLine()
-                    if (error != null) {
-                        return error
-                    }
-
+            process.inputStream.bufferedReader().use { reader ->
+                process.errorStream.bufferedReader().use { errorReader ->
+                    reader.readLine() ?: errorReader.readLine() ?: "command out: null, error message: null"
                     // 按道理来说是执行不到这里的，这两个不可能都是 null
-                    return "command out: $result, error message: $error"
                 }
-            }
-        }
-        catch (e: IOException) {
-            Log.e(TAG, "An exception threw in BusyBoxDetector.executeBinary()", e)
-            return null
-        }
+            }.also { process.destroy() }
+        }.onFailure {
+            Log.e(TAG, "An exception threw in BusyBoxDetector.executeBinary()", it)
+        }.getOrNull()
     }
 
     companion object {
