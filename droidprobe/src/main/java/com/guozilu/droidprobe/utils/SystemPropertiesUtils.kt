@@ -20,15 +20,13 @@ object SystemPropertiesUtils {
     external fun getprop(key: String): String?
 
     fun getprop(): String? {
-        try {
+        return runCatching {
             val process: Process = Runtime.getRuntime().exec(arrayOf("getprop"))
-            return process.inputStream.bufferedReader().use { bufferedReader ->
-                bufferedReader.readText()
-            }
-        }
-        catch (e: IOException) {
-            Log.e(TAG, "An exception threw in SystemPropertiesUtils.getprop()", e)
-            return null
-        }
+            process.inputStream.bufferedReader().use {
+                it.readText()
+            }.also { process.destroy() }
+        }.onFailure {
+            Log.e(TAG, "An exception threw in SystemPropertiesUtils.getprop()", it)
+        }.getOrNull()
     }
 }
