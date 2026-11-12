@@ -166,20 +166,11 @@ abstract class AbstractRootBinaryDetector(
             // 拆解一下
             // 因为不同手机的可执行文件的目录是有差别的，KNOWN_COMMON_PATHS 只是涵盖一些普通情况和一些极端情况
             // 读取系统的 PATH 才能真正知道所有的可执行目录在哪
-            val systemPaths: String? = System.getenv("PATH")
-            if (systemPaths.isNullOrEmpty()) {
-                return paths
-            }
+            val systemPaths = System.getenv("PATH") ?: return paths
 
-            systemPaths.split(":").forEach { systemPath: String ->
-                var systemPathTemp = systemPath
-                if (!systemPathTemp.endsWith("/")) {
-                    systemPathTemp += "/"
-                }
-                if (!paths.contains(systemPathTemp)) {
-                    paths.add(systemPathTemp)
-                }
-            }
+            systemPaths.split(":")
+                .map { if (it.endsWith("/")) it else "$it/" }
+                .forEach { if (it !in paths) paths.add(it) }
 
             return paths
         }
