@@ -21,23 +21,21 @@ class SuDetector : AbstractRootBinaryDetector(
      * @return 如果能执行，执行的结果符合 root，那么返回中间采集的证据，如果都不满足返回空的 List
      */
     override fun detectBinaryExecutionEvidences(rootBinaryFile: File): List<DetectionEvidence> {
-        val evidences: MutableList<DetectionEvidence> = ArrayList()
-        if (rootBinaryFile.canExecute()) {
-            evidences.add(DetectionEvidence(
+        return buildList {
+            if (rootBinaryFile.canExecute()) {
+                add(DetectionEvidence(
                     "SU_EXECUTION",
-                rootBinaryFile.absolutePath + " can execute",
-                "发现可执行的 su 文件"
-            ))
-            val executeSuResult: String? = executeBinary()
-            if (executeSuResult != null) {
-                evidences.add(DetectionEvidence(
-                    "SU_EXECUTED",
-                    executeSuResult,
-                    "执行 su -c id 后 $executeSuResult"
+                    rootBinaryFile.absolutePath + " can execute",
+                    "发现可执行的 su 文件"
                 ))
+                executeBinary()?.let {
+                    add(DetectionEvidence(
+                    "SU_EXECUTED",
+                    it,
+                    "执行 su -c id 后 $it"
+                )) }
             }
         }
-        return evidences
     }
 
     /**

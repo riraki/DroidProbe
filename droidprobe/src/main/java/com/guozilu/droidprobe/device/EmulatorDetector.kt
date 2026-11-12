@@ -12,7 +12,13 @@ class EmulatorDetector : AbstractDetector(
     DetectionCategory.DEVICE) {
 
     override fun doDetect(context: Context?): DetectionResult {
-        return DetectionResult(id, category, DetectionStatus.NOT_SUPPORTED, RiskLevel.UNKNOWN, null)
+        return DetectionResult(
+            id,
+            category,
+            DetectionStatus.NOT_SUPPORTED,
+            RiskLevel.UNKNOWN,
+            null
+        )
     }
 
     companion object {
