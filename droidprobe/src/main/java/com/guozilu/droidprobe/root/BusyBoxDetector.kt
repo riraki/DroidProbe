@@ -23,23 +23,22 @@ class BusyBoxDetector : AbstractRootBinaryDetector(
      * @return 如果能执行，执行的结果符合 root，那么返回中间采集的证据，如果都不满足返回空的 List
      */
     override fun detectBinaryExecutionEvidences(rootBinaryFile: File): List<DetectionEvidence> {
-        val evidences: MutableList<DetectionEvidence> = ArrayList()
-        if (rootBinaryFile.canExecute()) {
-            evidences.add(DetectionEvidence(
-                "BUSYBOX_EXECUTION",
-                rootBinaryFile.absolutePath + " can execute",
-                "发现可执行的 busybox 文件"
-            ))
-            val executeSuResult: String? = executeBinary()
-            if (executeSuResult != null) {
-                evidences.add(DetectionEvidence(
-                    "BUSYBOX_EXECUTED",
-                    executeSuResult,
-                    "执行 busybox ls /sdcard 后，得到：$executeSuResult"
+        return buildList {
+            if (rootBinaryFile.canExecute()) {
+                add(DetectionEvidence(
+                    "BUSYBOX_EXECUTION",
+                    rootBinaryFile.absolutePath + " can execute",
+                    "发现可执行的 busybox 文件"
                 ))
+                executeBinary()?.let {
+                    add(DetectionEvidence(
+                        "BUSYBOX_EXECUTED",
+                        it,
+                        "执行 busybox ls /sdcard 后，得到：$it"
+                    ))
+                }
             }
         }
-        return evidences
     }
 
     /**

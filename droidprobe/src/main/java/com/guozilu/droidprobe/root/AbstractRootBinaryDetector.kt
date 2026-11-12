@@ -91,18 +91,18 @@ abstract class AbstractRootBinaryDetector(
      * @return 结果成立时的证据，如果都不成立则返回空的 List
      */
     private fun detectBinaryPathEvidences(path: String): List<DetectionEvidence> {
-        val evidences: MutableList<DetectionEvidence> = ArrayList()
-        val file = File(path)
-        if (file.exists()) {
-            evidences.add(DetectionEvidence(
-                file.name.uppercase() + "_PATH",
-                path,
-                "发现 " + file.name + " 文件"
-            ))
+        return buildList {
+            val file = File(path)
+            if (file.exists()) {
+                add(DetectionEvidence(
+                    "${file.name.uppercase()}_PATH",
+                    path,
+                    "发现 ${file.name} 文件"
+                ))
 
-            evidences.addAll(detectBinaryExecutionEvidences(file))
+                addAll(detectBinaryExecutionEvidences(file))
+            }
         }
-        return evidences
     }
 
     /**

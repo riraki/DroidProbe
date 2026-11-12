@@ -94,12 +94,7 @@ class ProcessIdentityDetector : AbstractDetector(
          */
         private fun rootInGroupsIndex(): Int? {
             val groups: IntArray = ProcessIdentityUtils.getGroups() ?: return null
-            for (i in groups.indices) {
-                if (groups[i] == 0) {
-                    return i
-                }
-            }
-            return null
+            return groups.indexOfFirst { it == 0 }
         }
     }
 }
