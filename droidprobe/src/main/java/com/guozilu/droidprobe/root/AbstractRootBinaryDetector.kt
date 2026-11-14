@@ -42,7 +42,7 @@ abstract class AbstractRootBinaryDetector(
                 whichBinary,
                 "执行 which $rootBinaryName 发现 $rootBinaryName 文件"
             ))
-            val file: File = File(whichBinary)
+            val file = File(whichBinary)
             evidences.addAll(detectBinaryExecutionEvidences(file))
         }
 
