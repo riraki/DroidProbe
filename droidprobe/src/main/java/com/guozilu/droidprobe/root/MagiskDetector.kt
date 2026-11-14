@@ -3,10 +3,7 @@ package com.guozilu.droidprobe.root
 import android.util.Log
 import com.guozilu.droidprobe.core.DetectionEvidence
 import com.guozilu.droidprobe.utils.MountUtils
-import java.io.BufferedReader
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
 
 /**
  * 这个类的检测功能其实和检测 su 是类似的

@@ -2,10 +2,7 @@ package com.guozilu.droidprobe.root
 
 import android.util.Log
 import com.guozilu.droidprobe.core.DetectionEvidence
-import java.io.BufferedReader
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
 
 /**
  * 检查 su 文件存不存在以及是否有可执行权限，并尝试执行 su -c id 能不能得到类似于
