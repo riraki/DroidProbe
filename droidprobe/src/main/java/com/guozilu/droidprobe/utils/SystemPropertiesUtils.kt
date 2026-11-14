@@ -1,7 +1,6 @@
 package com.guozilu.droidprobe.utils
 
 import android.util.Log
-import java.io.IOException
 
 object SystemPropertiesUtils {
     private const val TAG: String = "SystemPropertiesUtils"
@@ -21,10 +20,20 @@ object SystemPropertiesUtils {
 
     fun getprop(): String? {
         return runCatching {
-            val process: Process = Runtime.getRuntime().exec(arrayOf("getprop"))
-            process.inputStream.bufferedReader().use {
-                it.readText()
-            }.also { process.destroy() }
+            Runtime.getRuntime().exec(arrayOf("getprop")).let { process ->
+                try {
+                    val output = process.inputStream.bufferedReader().use { it.readText() }
+                    process.outputStream.close()
+                    process.errorStream.close()
+
+                    process.waitFor()
+
+                    output
+                }
+                finally {
+                    process.destroy()
+                }
+            }
         }.onFailure {
             Log.e(TAG, "An exception threw in SystemPropertiesUtils.getprop()", it)
         }.getOrNull()

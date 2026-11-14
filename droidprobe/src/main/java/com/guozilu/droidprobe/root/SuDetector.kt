@@ -45,16 +45,23 @@ class SuDetector : AbstractRootBinaryDetector(
      */
     override fun executeBinary(): String? {
         return runCatching {
-            val process: Process = Runtime.getRuntime().exec(arrayOf("su", "-c", "id"))
-            process.inputStream.bufferedReader().use { reader ->
-                process.errorStream.bufferedReader().use { errorReader ->
-                    // 如果用户拒绝了权限，那么 result 就应该是 null，error 是 Permission denied
-                    // 如果用户允许了，那么 result 就应该是 uid=0(root) gid=0(root) groups=0(root) context=u:r:magisk:s0
-                    // error 是 null
-                    reader.readLine() ?: errorReader.readLine() ?: "command out: null, error message: null"
-                    // 按道理来说是执行不到这里的，这两个不可能都是 null
+            Runtime.getRuntime().exec(arrayOf("su", "-c", "id")).let { process ->
+                val output = process.inputStream.bufferedReader().use { reader ->
+                    process.errorStream.bufferedReader().use { errorReader ->
+                        // 如果用户拒绝了权限，那么 result 就应该是 null，error 是 Permission denied
+                        // 如果用户允许了，那么 result 就应该是 uid=0(root) gid=0(root) groups=0(root) context=u:r:magisk:s0
+                        // error 是 null
+                        reader.readLine() ?: errorReader.readLine()
+                        ?: "command out: null, error message: null"
+                        // 按道理来说是执行不到这里的，这两个不可能都是 null
+                    }
                 }
-            }.also { process.destroy() }
+                process.outputStream.close()
+
+                process.waitFor()
+
+                output
+            }
         }.onFailure {
             Log.e(TAG, "An exception threw in SuDetector.executeBinary()", it)
         }.getOrNull()

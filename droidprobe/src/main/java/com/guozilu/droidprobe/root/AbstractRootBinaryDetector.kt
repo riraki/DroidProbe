@@ -8,10 +8,7 @@ import com.guozilu.droidprobe.core.DetectionEvidence
 import com.guozilu.droidprobe.core.DetectionResult
 import com.guozilu.droidprobe.core.DetectionStatus
 import com.guozilu.droidprobe.core.RiskLevel
-import java.io.BufferedReader
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
 import java.util.Collections
 
 /**
@@ -76,10 +73,20 @@ abstract class AbstractRootBinaryDetector(
      */
     private fun getWhichBinaryResult(): String? {
         return runCatching {
-            val process: Process = Runtime.getRuntime().exec(arrayOf("which", rootBinaryName))
-            process.inputStream.bufferedReader().use {
-                it.readLine()
-            }.also { process.destroy() }
+            Runtime.getRuntime().exec(arrayOf("which", rootBinaryName)).let { process ->
+                try {
+                    val output = process.inputStream.bufferedReader().use { it.readLine() }
+                    process.outputStream.close()
+                    process.errorStream.close()
+
+                    process.waitFor()
+
+                    output
+                }
+                finally {
+                    process.destroy()
+                }
+            }
         }.onFailure {
             Log.e(TAG, "An exception was caught in AbstractRootBinaryDetector.getWhichBinaryResult()", it)
         }.getOrNull()

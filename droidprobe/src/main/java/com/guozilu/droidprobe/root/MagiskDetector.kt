@@ -48,13 +48,25 @@ class MagiskDetector : AbstractRootBinaryDetector(
      */
     override fun executeBinary(): String? {
         return runCatching {
-            val process: Process = Runtime.getRuntime().exec(arrayOf("magisk", "-v"))
-            process.inputStream.bufferedReader().use { reader ->
-                process.errorStream.bufferedReader().use { errorReader ->
-                    reader.readLine() ?: errorReader.readLine() ?: "command out: null, error message: null"
-                    // 按道理来说是执行不到这里的，这两个不可能都是 null
+            Runtime.getRuntime().exec(arrayOf("magisk", "-v")).let { process ->
+                try {
+                    val output = process.inputStream.bufferedReader().use { reader ->
+                        process.errorStream.bufferedReader().use { errorReader ->
+                            reader.readLine() ?: errorReader.readLine()
+                            ?: "command out: null, error message: null"
+                            // 按道理来说是执行不到这里的，这两个不可能都是 null
+                        }
+                    }
+                    process.outputStream.close()
+
+                    process.waitFor()
+
+                    output
                 }
-            }.also { process.destroy() }
+                finally {
+                    process.destroy()
+                }
+            }
         }.onFailure {
             Log.e(TAG, "An exception threw in MagiskDetector.executeBinary()", it)
         }.getOrNull()
