@@ -38,23 +38,13 @@ class APatchDetector : AbstractNativeRootDetector(
     "APatch") {
 
     override fun getRiskLevel(riskScore: Int): RiskLevel {
-        return if (riskScore >= 85) {
-            RiskLevel.CRITICAL
-        }
-        else if (riskScore >= 65) {
-            RiskLevel.MEDIUM_HIGH
-        }
-        else if (riskScore >= 40) {
-            RiskLevel.MEDIUM
-        }
-        else if (riskScore > 0) {
-            RiskLevel.LOW
-        }
-        else if (riskScore == 0) {
-            RiskLevel.NONE
-        }
-        else {
-            RiskLevel.UNKNOWN
+        return when {
+            riskScore >= 85 -> RiskLevel.CRITICAL
+            riskScore >= 65 -> RiskLevel.MEDIUM_HIGH
+            riskScore >= 40 -> RiskLevel.MEDIUM
+            riskScore > 0 -> RiskLevel.LOW
+            riskScore == 0 -> RiskLevel.NONE
+            else -> RiskLevel.UNKNOWN
         }
     }
 
