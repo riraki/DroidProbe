@@ -41,26 +41,14 @@ class KernelSuDetector : AbstractNativeRootDetector(
      * @return 与分值对应的风险等级
      */
     override fun getRiskLevel(riskScore: Int): RiskLevel {
-        if (riskScore >= 90) {
-            return RiskLevel.CRITICAL
-        }
-        else if (riskScore >= 75) {
-            return RiskLevel.HIGH
-        }
-        else if (riskScore >= 60) {
-            return RiskLevel.MEDIUM_HIGH
-        }
-        else if (riskScore >= 40) {
-            return RiskLevel.MEDIUM
-        }
-        else if (riskScore > 0) {
-            return RiskLevel.LOW
-        }
-        else if (riskScore == 0) {
-            return RiskLevel.NONE
-        }
-        else {
-            return RiskLevel.UNKNOWN
+        return when {
+            riskScore >= 90 -> RiskLevel.CRITICAL
+            riskScore >= 75 -> RiskLevel.HIGH
+            riskScore >= 60 -> RiskLevel.MEDIUM_HIGH
+            riskScore >= 40 -> RiskLevel.MEDIUM
+            riskScore > 0 -> RiskLevel.LOW
+            riskScore == 0 -> RiskLevel.NONE
+            else -> RiskLevel.UNKNOWN
         }
     }
 
